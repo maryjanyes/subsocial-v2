@@ -215,4 +215,20 @@ impl<T: Trait> Module<T> {
         Ok(())
     }
 
+    pub fn scoring_action_by_post_extension(extension: PostExtension, reaction_kind: ReactionKind) -> ScoringAction {
+        let mut scoring_action: ScoringAction = ScoringAction::default();
+
+        match extension {
+            PostExtension::RegularPost | PostExtension::SharedPost(_) => match reaction_kind {
+                ReactionKind::Upvote => scoring_action = ScoringAction::UpvotePost,
+                ReactionKind::Downvote => scoring_action = ScoringAction::DownvotePost,
+            },
+            PostExtension::Comment(_) => match reaction_kind {
+                ReactionKind::Upvote => scoring_action = ScoringAction::UpvoteComment,
+                ReactionKind::Downvote => scoring_action = ScoringAction::DownvoteComment,
+            },
+        }
+
+        scoring_action
+    }
 }
