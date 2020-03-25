@@ -1,6 +1,6 @@
 use super::*;
 
-use frame_support::{dispatch::DispatchResult};
+use frame_support::{dispatch::{DispatchResult, DispatchError}};
 
 impl<T: Trait> Module<T> {
 
@@ -141,7 +141,7 @@ impl<T: Trait> Module<T> {
         <SocialAccountById<T>>::insert(account.clone(), social_account.clone());
 
         let comment_id = comment.id;
-        let comment_ext;
+        let comment_ext = comment.get_comment_ext()?;
 
         ensure!(comment.is_comment(), Error::<T>::PostIsNotAComment);
 
