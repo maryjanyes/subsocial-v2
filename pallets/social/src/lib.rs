@@ -285,10 +285,14 @@ decl_error! {
     OutOfBoundsUpdatingPostScore,
     /// Out of bounds reverting post score
     OutOfBoundsRevertingPostScore,
+    /// Post extension is a comment, better use change_post_score_by_extension()
+    PostIsAComment,
     /// Out of bounds updating comment score
     OutOfBoundsUpdatingCommentScore,
     /// Out of bounds reverting comment score
     OutOfBoundsRevertingCommentScore,
+    /// Post extension is not a comment, better use change_post_score_by_extension()
+    PostIsNotAComment,
     /// Out of bounds updating social account reputation
     OutOfBoundsUpdatingAccountReputation,
     /// Scored account reputation difference by account and action not found
@@ -804,7 +808,7 @@ decl_module! {
       let action = Self::scoring_action_by_post_extension(post.extension, kind, false);
 
       if post.created.account != owner {
-        Self::change_post_score(owner.clone(), post, action)?;
+        Self::change_post_score_by_extension(owner.clone(), post, action)?;
       }
       else {
         <PostById<T>>::insert(post_id, post);
@@ -846,8 +850,8 @@ decl_module! {
       let action = Self::scoring_action_by_post_extension(post.extension, new_kind, false);
       let action_to_cancel = Self::scoring_action_by_post_extension(post.extension, new_kind, true);
 
-      Self::change_post_score(owner.clone(), post, action_to_cancel)?;
-      Self::change_post_score(owner.clone(), post, action)?;
+      Self::change_post_score_by_extension(owner.clone(), post, action_to_cancel)?;
+      Self::change_post_score_by_extension(owner.clone(), post, action)?;
 
       <ReactionById<T>>::insert(reaction_id, reaction);
       <PostById<T>>::insert(post_id, post);
@@ -874,7 +878,7 @@ decl_module! {
       }
       let action_to_cancel = Self::scoring_action_by_post_extension(post.extension, reaction.kind, false);
 
-      Self::change_post_score(owner.clone(), post, action_to_cancel)?;
+      Self::change_post_score_by_extension(owner.clone(), post, action_to_cancel)?;
 
       <PostById<T>>::insert(post_id, post);
       <ReactionById<T>>::remove(reaction_id);
