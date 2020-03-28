@@ -14,6 +14,7 @@ use frame_support::{decl_module, decl_storage, decl_event, decl_error, ensure};
 use sp_runtime::RuntimeDebug;
 use system::ensure_signed;
 use pallet_timestamp;
+use pallet_social_ban;
 use pallet_utils::WhoAndWhen;
 
 #[derive(Encode, Decode, Clone, Eq, PartialEq, RuntimeDebug)]
@@ -204,7 +205,7 @@ pub type CommentId = u64;
 pub type ReactionId = u64;
 
 /// The pallet's configuration trait.
-pub trait Trait: system::Trait + pallet_timestamp::Trait {
+pub trait Trait: pallet_social_ban::Trait + pallet_timestamp::Trait {
   /// The overarching event type.
   type Event: From<Event<Self>> + Into<<Self as system::Trait>::Event>;
 }

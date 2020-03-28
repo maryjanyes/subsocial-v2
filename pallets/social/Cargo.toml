@@ -14,7 +14,8 @@ std = [
     'sp-std/std',
     'system/std',
     'pallet-timestamp/std',
-    'pallet-utils/std'
+    'pallet-utils/std',
+    'pallet-social-ban/std'
 ]
 
 [dependencies.codec]
@@ -63,6 +64,11 @@ version = '2.0.0'
 [dependencies.pallet-utils]
 default-features = false
 path = '../utils'
+version = '2.0.0'
+
+[dependencies.pallet-social-ban]
+default-features = false
+path = '../social-ban'
 version = '2.0.0'
 
 [dev-dependencies.sp-core]
