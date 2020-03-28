@@ -3,7 +3,7 @@ authors = ["Dappforce"]
 description = 'Ban module for spaces'
 edition = '2018'
 name = 'pallet-social-ban'
-version = '2.0.0-alpha.3'
+version = '2.0.0'
 
 [features]
 default = ['std']
