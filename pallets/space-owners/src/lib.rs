@@ -10,6 +10,7 @@ use frame_support::{decl_module, decl_storage, decl_event, decl_error, ensure, t
 use sp_runtime::{RuntimeDebug, traits::Zero};
 use system::ensure_signed;
 use pallet_timestamp;
+use pallet_social_ban::{SocialBanShared};
 
 #[derive(Encode, Decode, Clone, Eq, PartialEq, RuntimeDebug)]
 pub struct WhoAndWhen<T: Trait> {
@@ -63,6 +64,8 @@ pub trait Trait: system::Trait + pallet_timestamp::Trait {
 
   /// Period in blocks to initialize cleaning of pending txs that are outdated.
   type CleanExpiredTxsPeriod: Get<Self::BlockNumber>;
+
+  type BanModule: SocialBanShared<Self::AccountId>;
 }
 
 decl_error! {
@@ -190,6 +193,9 @@ decl_module! {
         threshold,
         changes_count: 0
       };
+
+      // T::BanModule::is_account_banned_in_scope(10, &who);
+      // check if account banned in scope
 
       <SpaceOwnersBySpaceById<T>>::insert(space_id, new_space_owners);
 

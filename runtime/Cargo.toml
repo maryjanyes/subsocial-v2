@@ -166,6 +166,10 @@ path = '../pallets/social'
 default-features = false
 path = '../pallets/space-owners'
 
+[dependencies.pallet-social-ban]
+default-features = false
+path = '../pallets/social-ban'
+
 [features]
 default = ['std']
 std = [
@@ -196,7 +200,8 @@ std = [
     'timestamp/std',
     'transaction-payment/std',
     'pallet-social/std',
-    'pallet-space-owners/std'
+    'pallet-space-owners/std',
+    'pallet-social-ban/std'
 ]
 
 [package]

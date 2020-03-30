@@ -251,6 +251,10 @@ impl pallet_space_owners::Trait for Runtime {
   type CleanExpiredTxsPeriod = CleanExpiredTxsPeriod;
 }
 
+impl pallet_social_ban::Trait for Runtime {
+  type Event = Event;
+}
+
 construct_runtime!(
   pub enum Runtime where
     Block = Block,
@@ -266,6 +270,7 @@ construct_runtime!(
     TransactionPayment: transaction_payment::{Module, Storage},
     Sudo: sudo,
     Social: pallet_social::{Module, Call, Storage, Event<T>},
+    SocialBan: pallet_social_ban::{Module, Call, Storage, Event<T>},
     Multiownership: pallet_space_owners::{Module, Call, Storage, Event<T>},
     RandomnessCollectiveFlip: randomness_collective_flip::{Module, Call, Storage},
   }
