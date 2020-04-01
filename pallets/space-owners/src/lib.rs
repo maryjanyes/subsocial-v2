@@ -51,11 +51,6 @@ pub trait SpaceOwnersShared<AccountId> {
 impl<T: Trait> SpaceOwnersShared<T::AccountId> for Module<T> {
   fn is_account_own_space(possible_owner: &T::AccountId, space_id: SpaceId) -> bool { 
     let spaces_for_possible_owner = Self::space_ids_owned_by_account_id(possible_owner);
-
-    if spaces_for_possible_owner.len() == 0 {
-      return false;
-    }
-
     spaces_for_possible_owner.contains(&space_id)
   }
 }

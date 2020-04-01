@@ -79,17 +79,17 @@ decl_module! {
 			let _owner = ensure_signed(origin)?;
 
 			ensure!(
-				!T::SpaceOwnersSharedModule::is_account_own_space(&subject_acc.clone(), scope_id),
+				T::SpaceOwnersSharedModule::is_account_own_space(&subject_acc.clone(), scope_id),
 				Error::<T>::AccountIsNotASpaceOwner
 			);
 
 			ensure!(
-				_owner == subject_acc,
+				_owner != subject_acc,
 				Error::<T>::CannotUnblockOwnAccount
 			);
 
 			ensure!(
-				Self::is_account_blocked_by_scope((scope_id, subject_acc.clone())),
+				!Self::is_account_blocked_by_scope((scope_id, subject_acc.clone())),
 				Error::<T>::AccountAlreadyBlockedInScope
 			);
 
@@ -116,7 +116,7 @@ decl_module! {
 			);
 
 			ensure!(
-				!Self::is_account_blocked_by_scope((scope_id, subject_acc.clone())),
+				Self::is_account_blocked_by_scope((scope_id, subject_acc.clone())),
 				Error::<T>::AccountNotBlockedByScope
 			);
 
