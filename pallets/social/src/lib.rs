@@ -552,6 +552,11 @@ decl_module! {
     pub fn unfollow_blog(origin, blog_id: BlogId) {
       let follower = ensure_signed(origin)?;
 
+      ensure!(
+        T::SocialBanSharedModule::is_account_banned_in_scope(blog_id, &follower.clone()),
+        Error::<T>::AccountBannedInBlogScope
+      );
+
       let ref mut blog = Self::blog_by_id(blog_id).ok_or(Error::<T>::BlogNotFound)?;
       ensure!(Self::blog_followed_by_account((follower.clone(), blog_id)), Error::<T>::AccountIsNotFollowingBlog);
 
@@ -580,11 +585,6 @@ decl_module! {
 
     pub fn follow_account(origin, account: T::AccountId) {
       let follower = ensure_signed(origin)?;
-
-      ensure!(
-        T::SocialBanSharedModule::is_account_banned_in_scope(0, &follower.clone()),
-        Error::<T>::AccountBannedInBlogScope
-      );
 
       ensure!(follower != account, Error::<T>::AccountCannotFollowItself);
       ensure!(!<AccountFollowedByAccount<T>>::exists((follower.clone(), account.clone())), Error::<T>::AccountIsAlreadyFollowed);
@@ -826,12 +826,6 @@ decl_module! {
 
     pub fn create_comment(origin, post_id: PostId, parent_id: Option<CommentId>, ipfs_hash: Vec<u8>) {
       let owner = ensure_signed(origin)?;
-
-      ensure!(
-        T::SocialBanSharedModule::is_account_banned_in_scope(post_id, &owner.clone()),
-        Error::<T>::AccountBannedInPostScope
-      );
-
       let ref mut post = Self::post_by_id(post_id).ok_or(Error::<T>::PostNotFound)?;
       Self::is_ipfs_hash_valid(ipfs_hash.clone())?;
 
@@ -869,14 +863,8 @@ decl_module! {
       Self::deposit_event(RawEvent::CommentCreated(owner.clone(), comment_id));
     }
 
-    pub fn update_comment(origin, post_id: PostId, comment_id: CommentId, update: CommentUpdate) {
+    pub fn update_comment(origin, comment_id: CommentId, update: CommentUpdate) {
       let owner = ensure_signed(origin)?;
-
-      ensure!(
-        T::SocialBanSharedModule::is_account_banned_in_scope(post_id, &owner.clone()),
-        Error::<T>::AccountBannedInPostScope
-      );
-
       let mut comment = Self::comment_by_id(comment_id).ok_or(Error::<T>::CommentNotFound)?;
       ensure!(owner == comment.created.account, Error::<T>::NotACommentAuthor);
 
@@ -900,11 +888,6 @@ decl_module! {
     pub fn create_post_reaction(origin, post_id: PostId, kind: ReactionKind) {
       let owner = ensure_signed(origin)?;
 
-      ensure!(
-        T::SocialBanSharedModule::is_account_banned_in_scope(post_id, &owner.clone()),
-        Error::<T>::AccountBannedInPostScope
-      );
-  
       ensure!(
         !<PostReactionIdByAccount<T>>::exists((owner.clone(), post_id)),
         Error::<T>::AccountAlreadyReactedToPost
@@ -940,11 +923,6 @@ decl_module! {
 
     pub fn update_post_reaction(origin, post_id: PostId, reaction_id: ReactionId, new_kind: ReactionKind) {
       let owner = ensure_signed(origin)?;
-
-      ensure!(
-        T::SocialBanSharedModule::is_account_banned_in_scope(post_id, &owner.clone()),
-        Error::<T>::AccountBannedInPostScope
-      );
 
       ensure!(
         <PostReactionIdByAccount<T>>::exists((owner.clone(), post_id)),
@@ -989,11 +967,6 @@ decl_module! {
       let owner = ensure_signed(origin)?;
 
       ensure!(
-        T::SocialBanSharedModule::is_account_banned_in_scope(post_id, &owner.clone()),
-        Error::<T>::AccountBannedInPostScope
-      );
-
-      ensure!(
         <PostReactionIdByAccount<T>>::exists((owner.clone(), post_id)),
         Error::<T>::PostReactionByAccountNotFound
       );
@@ -1025,13 +998,8 @@ decl_module! {
       Self::deposit_event(RawEvent::PostReactionDeleted(owner.clone(), post_id, reaction_id));
     }
 
-    pub fn create_comment_reaction(origin, post_id: PostId, comment_id: CommentId, kind: ReactionKind) {
+    pub fn create_comment_reaction(origin, comment_id: CommentId, kind: ReactionKind) {
       let owner = ensure_signed(origin)?;
-
-      ensure!(
-        T::SocialBanSharedModule::is_account_banned_in_scope(post_id, &owner.clone()),
-        Error::<T>::AccountBannedInPostScope
-      );
 
       ensure!(
         !<CommentReactionIdByAccount<T>>::exists((owner.clone(), comment_id)),
@@ -1065,13 +1033,8 @@ decl_module! {
       Self::deposit_event(RawEvent::CommentReactionCreated(owner.clone(), comment_id, reaction_id));
     }
 
-    pub fn update_comment_reaction(origin, post_id: PostId, comment_id: CommentId, reaction_id: ReactionId, new_kind: ReactionKind) {
+    pub fn update_comment_reaction(origin, comment_id: CommentId, reaction_id: ReactionId, new_kind: ReactionKind) {
       let owner = ensure_signed(origin)?;
-
-      ensure!(
-        T::SocialBanSharedModule::is_account_banned_in_scope(post_id, &owner.clone()),
-        Error::<T>::AccountBannedInPostScope
-      );
   
       ensure!(
         <CommentReactionIdByAccount<T>>::exists((owner.clone(), comment_id)),
