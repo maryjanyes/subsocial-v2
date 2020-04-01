@@ -45,13 +45,13 @@ type SpaceId = u64;
 type TransactionId = u64;
 
 pub trait SpaceOwnersShared<AccountId> {
-  fn is_account_own_space(possible_owner: &AccountId, space_id: SpaceId) -> bool;
+  fn is_account_a_space_owner(possible_owner: &AccountId, space_id: SpaceId) -> bool;
 }
 
 impl<T: Trait> SpaceOwnersShared<T::AccountId> for Module<T> {
-  fn is_account_own_space(possible_owner: &T::AccountId, space_id: SpaceId) -> bool { 
-    let spaces_for_possible_owner = Self::space_ids_owned_by_account_id(possible_owner);
-    spaces_for_possible_owner.contains(&space_id)
+  fn is_account_a_space_owner(possible_owner: &T::AccountId, space_id: SpaceId) -> bool { 
+    Self::space_ids_owned_by_account_id(possible_owner)
+      .contains(&space_id)
   }
 }
 

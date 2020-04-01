@@ -247,8 +247,6 @@ decl_error! {
     OverflowAddingCommentOnPost,
     /// Overflow replying on comment
     OverflowReplyingOnComment,
-    /// Account banned in scope that try to be updated
-    AccountBannedInThisScope,
 
     /// Reaction was not found by id
     ReactionNotFound,
@@ -356,11 +354,9 @@ decl_error! {
     UsernameIsNotAlphanumeric,
 
     /// Account do not have permissions to act with this blog in case of ban
-    AccountBannedInBlogScope,
+    AccountBlockedInBlog,
     /// Account do not have permissions to act with this post in case of ban
-    AccountBannedInPostScope,
-    /// Account do not have permissions to act with this scope in case of ban
-    AccountBannedInScope
+    AccountBlockedInPost
   }
 }
 
@@ -539,8 +535,8 @@ decl_module! {
       let follower = ensure_signed(origin)?;
 
       ensure!(
-        T::SocialBanSharedModule::is_account_banned_in_scope(blog_id, &follower.clone()),
-        Error::<T>::AccountBannedInBlogScope
+        !T::SocialBanSharedModule::is_account_banned_in_scope(blog_id, &follower.clone()),
+        Error::<T>::AccountBlockedInBlog
       );
 
       let ref mut blog = Self::blog_by_id(blog_id).ok_or(Error::<T>::BlogNotFound)?;
@@ -553,8 +549,8 @@ decl_module! {
       let follower = ensure_signed(origin)?;
 
       ensure!(
-        T::SocialBanSharedModule::is_account_banned_in_scope(blog_id, &follower.clone()),
-        Error::<T>::AccountBannedInBlogScope
+        !T::SocialBanSharedModule::is_account_banned_in_scope(blog_id, &follower.clone()),
+        Error::<T>::AccountBlockedInBlog
       );
 
       let ref mut blog = Self::blog_by_id(blog_id).ok_or(Error::<T>::BlogNotFound)?;
@@ -717,8 +713,8 @@ decl_module! {
       let owner = ensure_signed(origin)?;
 
       ensure!(
-        T::SocialBanSharedModule::is_account_banned_in_scope(blog_id, &owner.clone()),
-        Error::<T>::AccountBannedInBlogScope
+        !T::SocialBanSharedModule::is_account_banned_in_scope(blog_id, &owner.clone()),
+        Error::<T>::AccountBlockedInPost
       );
 
       let mut blog = Self::blog_by_id(blog_id).ok_or(Error::<T>::BlogNotFound)?;
@@ -768,8 +764,8 @@ decl_module! {
       let owner = ensure_signed(origin)?;
 
       ensure!(
-        T::SocialBanSharedModule::is_account_banned_in_scope(post_id, &owner.clone()),
-        Error::<T>::AccountBannedInPostScope
+        !T::SocialBanSharedModule::is_account_banned_in_scope(post_id, &owner.clone()),
+        Error::<T>::AccountBlockedInPost
       );
 
       let has_updates =
@@ -1035,7 +1031,7 @@ decl_module! {
 
     pub fn update_comment_reaction(origin, comment_id: CommentId, reaction_id: ReactionId, new_kind: ReactionKind) {
       let owner = ensure_signed(origin)?;
-  
+
       ensure!(
         <CommentReactionIdByAccount<T>>::exists((owner.clone(), comment_id)),
         Error::<T>::AccountNotYetReactedToComment

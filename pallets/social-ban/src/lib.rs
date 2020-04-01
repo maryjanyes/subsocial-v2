@@ -49,9 +49,9 @@ decl_event! {
 // The pallet's errors
 decl_error! {
 	pub enum Error for Module<T: Trait> {
-		/// Unpossible to block youré own account
-		UnpossibleToBlockOwnAccount,
-		/// Unpossible to unblock youré own account
+		/// Cannot block youré own account
+		CannotBlockOwnAccount,
+		/// Cannot unblock youré own account
 		CannotUnblockOwnAccount,
 		/// Unable to found Account with our ID to be blocked
 		AccountNotFound,
@@ -59,7 +59,7 @@ decl_error! {
 		ScopeNotFound,
 		/// Attempt to block account that already blocked by Scope
 		AccountAlreadyBlockedInScope,
-		/// Account not blocked by this Scope yet
+		/// Account is not blocked in this scope
 		AccountNotBlockedByScope,
 		/// You not a owner of that space
 		AccountIsNotASpaceOwner
@@ -79,13 +79,13 @@ decl_module! {
 			let _owner = ensure_signed(origin)?;
 
 			ensure!(
-				T::SpaceOwnersSharedModule::is_account_own_space(&subject_acc.clone(), scope_id),
+				T::SpaceOwnersSharedModule::is_account_a_space_owner(&subject_acc.clone(), scope_id),
 				Error::<T>::AccountIsNotASpaceOwner
 			);
 
 			ensure!(
 				_owner != subject_acc,
-				Error::<T>::CannotUnblockOwnAccount
+				Error::<T>::CannotBlockOwnAccount
 			);
 
 			ensure!(
@@ -106,12 +106,12 @@ decl_module! {
 			let _owner = ensure_signed(origin)?;
 
 			ensure!(
-				_owner == subject_acc,
+				_owner != subject_acc,
 				Error::<T>::CannotUnblockOwnAccount
 			);
 
 			ensure!(
-				!T::SpaceOwnersSharedModule::is_account_own_space(&subject_acc.clone(), scope_id),
+				T::SpaceOwnersSharedModule::is_account_a_space_owner(&subject_acc.clone(), scope_id),
 				Error::<T>::AccountIsNotASpaceOwner
 			);
 

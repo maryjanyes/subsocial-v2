@@ -4,9 +4,8 @@ pub use super::*;
 
 use sp_core::H256;
 use frame_support::{impl_outer_origin, assert_ok, assert_noop, parameter_types, weights::Weight, dispatch::DispatchResult};
-use system;
 use sp_runtime::{traits::{BlakeTwo256, IdentityLookup}, testing::Header, Perbill};
-use pallet_space_owners::{SpaceOwnersShared};
+use pallet_space_owners as SpaceOwners;
 
 impl_outer_origin! {
   pub enum Origin for SocialBanTest {}
@@ -46,9 +45,20 @@ impl system::Trait for SocialBanTest {
   type AvailableBlockRatio = AvailableBlockRatio;
 }
 
+impl pallet_space_owners::Trait for SocialBanTest { }
+
+parameter_types! {
+  pub const MinimumPeriod: u64 = 5;
+}
+impl pallet_timestamp::Trait for SocialBanTest {
+  type Moment = u64;
+  type OnTimestampSet = ();
+  type MinimumPeriod = MinimumPeriod;
+}
+
 impl Trait for SocialBanTest {
 	type Event = ();
-	type SpaceOwnersSharedModule = SpaceOwnersShared;
+	type SpaceOwnersSharedModule = SpaceOwnersModule;
 }
 
 type SocialBanTestModule = Module<SocialBanTest>;
@@ -69,3 +79,5 @@ fn test1() {
 		));
 	});
 }
+
+pub type SpaceOwnersModule = pallet_space_owners::Module<SocialBanTest>;

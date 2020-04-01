@@ -1,6 +1,6 @@
 [package]
 authors = ["Dappforce"]
-description = 'Ban module for spaces'
+description = 'Block/unblock accounts per scope (blog or post)'
 edition = '2018'
 name = 'pallet-social-ban'
 version = '2.0.0'
@@ -50,7 +50,7 @@ version = '2.0.0-alpha.3'
 default-features = false
 git = 'https://github.com/paritytech/substrate.git'
 rev = '3e651110aa06aa835790df63410a29676243fc54'
-version = '2.0.0'
+version = '2.0.0-alpha.3'
 
 [dependencies.sp-runtime]
 default-features = false
