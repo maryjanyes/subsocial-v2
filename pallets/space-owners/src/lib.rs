@@ -10,7 +10,6 @@ use frame_support::{decl_module, decl_storage, decl_event, decl_error, ensure, t
 use sp_runtime::{RuntimeDebug, traits::Zero};
 use system::ensure_signed;
 use pallet_timestamp;
-use pallet_social_ban::{SocialBanShared};
 
 #[derive(Encode, Decode, Clone, Eq, PartialEq, RuntimeDebug)]
 pub struct WhoAndWhen<T: Trait> {
@@ -45,6 +44,22 @@ pub struct Transaction<T: Trait> {
 type SpaceId = u64;
 type TransactionId = u64;
 
+pub trait SpaceOwnersShared<AccountId> {
+  fn is_account_own_space(possible_owner: &AccountId, space_id: SpaceId) -> bool;
+}
+
+impl<T: Trait> SpaceOwnersShared<T::AccountId> for Module<T> {
+  fn is_account_own_space(possible_owner: &T::AccountId, space_id: SpaceId) -> bool { 
+    let spaces_for_possible_owner = Self::space_ids_owned_by_account_id(possible_owner);
+
+    if spaces_for_possible_owner.len() == 0 {
+      return false;
+    }
+
+    spaces_for_possible_owner.contains(&space_id)
+  }
+}
+
 /// The pallet's configuration trait.
 pub trait Trait: system::Trait + pallet_timestamp::Trait {
   /// The overarching event type.
@@ -64,8 +79,6 @@ pub trait Trait: system::Trait + pallet_timestamp::Trait {
 
   /// Period in blocks to initialize cleaning of pending txs that are outdated.
   type CleanExpiredTxsPeriod: Get<Self::BlockNumber>;
-
-  type BanModule: SocialBanShared<Self::AccountId>;
 }
 
 decl_error! {
@@ -193,9 +206,6 @@ decl_module! {
         threshold,
         changes_count: 0
       };
-
-      // T::BanModule::is_account_banned_in_scope(10, &who);
-      // check if account banned in scope
 
       <SpaceOwnersBySpaceById<T>>::insert(space_id, new_space_owners);
 

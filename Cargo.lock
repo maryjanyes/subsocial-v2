@@ -2845,6 +2845,7 @@ version = "2.0.0"
 dependencies = [
  "frame-support 2.0.0",
  "frame-system 2.0.0",
+ "pallet-social-ban",
  "pallet-timestamp",
  "pallet-utils",
  "parity-scale-codec",
@@ -2860,6 +2861,7 @@ version = "2.0.0"
 dependencies = [
  "frame-support 2.0.0-alpha.3",
  "frame-system 2.0.0-alpha.3",
+ "pallet-space-owners",
  "parity-scale-codec",
  "safe-mix",
  "sp-core 2.0.0-alpha.3",
@@ -2874,7 +2876,6 @@ version = "2.0.0"
 dependencies = [
  "frame-support 2.0.0",
  "frame-system 2.0.0",
- "pallet-social-ban",
  "pallet-timestamp",
  "parity-scale-codec",
  "sp-core 2.0.0",

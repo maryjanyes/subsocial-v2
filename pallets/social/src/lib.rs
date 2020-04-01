@@ -15,6 +15,7 @@ use sp_runtime::RuntimeDebug;
 use system::ensure_signed;
 use pallet_timestamp;
 use pallet_utils::WhoAndWhen;
+use pallet_social_ban::{SocialBanShared};
 
 #[derive(Encode, Decode, Clone, Eq, PartialEq, RuntimeDebug)]
 pub struct Blog<T: Trait> {
@@ -207,6 +208,7 @@ pub type ReactionId = u64;
 pub trait Trait: system::Trait + pallet_timestamp::Trait {
   /// The overarching event type.
   type Event: From<Event<Self>> + Into<<Self as system::Trait>::Event>;
+  type SocialBanSharedModule: SocialBanShared<Self::AccountId>;
 }
 
 decl_error! {
@@ -245,6 +247,8 @@ decl_error! {
     OverflowAddingCommentOnPost,
     /// Overflow replying on comment
     OverflowReplyingOnComment,
+    /// Account banned in scope that try to be updated
+    AccountBannedInThisScope,
 
     /// Reaction was not found by id
     ReactionNotFound,
@@ -565,6 +569,12 @@ decl_module! {
     pub fn follow_account(origin, account: T::AccountId) {
       let follower = ensure_signed(origin)?;
 
+      // todo: !
+      ensure!(
+        T::SocialBanSharedModule::is_account_banned_in_scope(0, &follower.clone()),
+        "Account that try to be follow already banned for this profile"
+      );
+
       ensure!(follower != account, Error::<T>::AccountCannotFollowItself);
       ensure!(!<AccountFollowedByAccount<T>>::exists((follower.clone(), account.clone())), Error::<T>::AccountIsAlreadyFollowed);
 
@@ -795,6 +805,11 @@ decl_module! {
 
     pub fn create_comment(origin, post_id: PostId, parent_id: Option<CommentId>, ipfs_hash: Vec<u8>) {
       let owner = ensure_signed(origin)?;
+
+      ensure!(
+        T::SocialBanSharedModule::is_account_banned_in_scope(post_id, &owner.clone()),
+        "Account that try to be follow already banned for this profile"
+      );
 
       let ref mut post = Self::post_by_id(post_id).ok_or(Error::<T>::PostNotFound)?;
       Self::is_ipfs_hash_valid(ipfs_hash.clone())?;

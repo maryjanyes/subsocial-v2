@@ -4,6 +4,7 @@ use sp_std::prelude::*;
 use sp_std::collections::{btree_set::BTreeSet};
 use frame_support::{decl_module, decl_storage, decl_event, decl_error, ensure};
 use system::ensure_signed;
+use pallet_space_owners::{SpaceOwnersShared};
 
 // todo: writing tests
 #[cfg(test)]
@@ -25,7 +26,8 @@ impl<T: Trait> SocialBanShared<T::AccountId> for Module<T> {
 
 // The pallet's configuration trait.
 pub trait Trait: system::Trait {
-	type Event: From<Event<Self>> + Into<<Self as system::Trait>::Event>; 
+	type Event: From<Event<Self>> + Into<<Self as system::Trait>::Event>;
+	type SpaceOwnersSharedModule: SpaceOwnersShared<Self::AccountId>;
 }
 
 // This pallet's storage items.
@@ -59,6 +61,8 @@ decl_error! {
 		AccountAlreadyBlockedInScope,
 		/// Account not blocked by this Scope yet
 		AccountNotBlockedByScope,
+		/// You not a owner of that space
+		AccountIsNotASpaceOwner
 	}
 }
 
@@ -75,13 +79,17 @@ decl_module! {
 			let _owner = ensure_signed(origin)?;
 
 			ensure!(
+				!T::SpaceOwnersSharedModule::is_account_own_space(&subject_acc.clone(), scope_id),
+				Error::<T>::AccountIsNotASpaceOwner
+			);
+
+			ensure!(
 				_owner == subject_acc,
 				Error::<T>::CannotUnblockOwnAccount
 			);
 
 			ensure!(
 				Self::is_account_blocked_by_scope((scope_id, subject_acc.clone())),
-				// <IsAccountBlockedInScope<T>>::contains_key((scope_id, subject_acc.clone())),
 				Error::<T>::AccountAlreadyBlockedInScope
 			);
 
@@ -100,6 +108,11 @@ decl_module! {
 			ensure!(
 				_owner == subject_acc,
 				Error::<T>::CannotUnblockOwnAccount
+			);
+
+			ensure!(
+				!T::SpaceOwnersSharedModule::is_account_own_space(&subject_acc.clone(), scope_id),
+				Error::<T>::AccountIsNotASpaceOwner
 			);
 
 			ensure!(
