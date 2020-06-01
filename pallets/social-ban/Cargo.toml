@@ -12,6 +12,7 @@ std = [
     'frame-support/std',
     'safe-mix/std',
     'system/std',
+    'pallet-timestamp/std',
     'sp-runtime/std',
     'sp-io/std',
     'sp-std/std',
@@ -64,6 +65,12 @@ git = 'https://github.com/paritytech/substrate.git'
 package = 'frame-system'
 rev = '013c1ee167354a08283fb69915fda56a62fee943'
 version = '2.0.0-alpha.3'
+
+[dependencies.pallet-timestamp]
+default-features = false
+git = 'https://github.com/paritytech/substrate.git'
+rev = '3e651110aa06aa835790df63410a29676243fc54'
+version = '2.0.0'
 
 [dependencies.pallet-space-owners]
 default-features = false

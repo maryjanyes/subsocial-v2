@@ -1031,7 +1031,6 @@ decl_module! {
 
     pub fn update_comment_reaction(origin, comment_id: CommentId, reaction_id: ReactionId, new_kind: ReactionKind) {
       let owner = ensure_signed(origin)?;
-
       ensure!(
         <CommentReactionIdByAccount<T>>::exists((owner.clone(), comment_id)),
         Error::<T>::AccountNotYetReactedToComment
